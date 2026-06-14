@@ -2,6 +2,21 @@
 
 const HUB_PASSWORD = 'nina3323';
 
+// ===== BRAND IDENTITY (shared by all generators) =====
+const BRAND_VOICE = `BRAND: Lea — biomagnetic pair therapy. In person on the Gold Coast (Australia) and online worldwide.
+WHO: Lea is a certified biomagnetism practitioner. Sessions are gentle, unhurried, deeply personal. Magnets are always placed in pairs on points found during a personal scan. No needles, no pressure, fully clothed.
+VOICE: warm, calm, reassuring, grounded, sensory. Speaks like a trusted, caring practitioner — never hypey, never salesy, never clickbait. Quiet confidence over excitement.
+LANGUAGE RULES: complementary wellness, NOT medical claims. Never promise to cure or treat disease. Words like "support", "balance", "calm", "ease", "rest" — not "heal disease" or "fix".
+ALWAYS sounds like Lea: soothing, human, a little poetic, deeply respectful of the reader's body and time.`;
+
+const BRAND_VISUAL = `VISUAL BRAND for Lea (biomagnetism, Gold Coast & online):
+- Mood: serene, warm, editorial wellness, stillness, natural light, intimate and calming.
+- Palette: soft cream/paper (#FCFAF5), warm sand & linen, muted gold (#BC9C6A), gentle clay/terracotta (#C57F6A), soft dusk blue (#8AA3BF), warm taupe browns. Low saturation, warm neutrals.
+- Light: soft diffused natural daylight, golden warmth, gentle shadows. Never harsh, never neon, never cold clinical.
+- Textures: linen, raw cotton, ceramic, warm timber, skin, smooth dark magnets, organic forms.
+- Composition: minimal, airy, lots of negative space, shallow depth of field, calm and uncluttered.
+- Avoid: clinical/medical hospital look, stocky corporate feel, busy backgrounds, harsh flash, oversaturated colors, text overlays.`;
+
 // Check password on load
 window.addEventListener('DOMContentLoaded', () => {
   const isAuthenticated = sessionStorage.getItem('hubAuthenticated');
@@ -97,6 +112,10 @@ generateBtn.addEventListener('click', async () => {
   const briefing = document.getElementById('briefing').value;
   const tone = document.getElementById('tone').value;
   const cta = document.getElementById('cta').value;
+  const language = document.getElementById('language').value;
+  const length = document.getElementById('length').value;
+  const audience = document.getElementById('audience').value;
+  const emojis = document.getElementById('emojis').value;
 
   if (!serviceType || !briefing.trim()) {
     alert('Please select a service and write your briefing.');
@@ -114,7 +133,7 @@ generateBtn.addEventListener('click', async () => {
   copyResults.innerHTML = '';
 
   try {
-    const prompt = buildPrompt(serviceType, platform, briefing, tone, cta);
+    const prompt = buildPrompt({ serviceType, platform, briefing, tone, cta, language, length, audience, emojis });
     const captions = await generateCaptions(prompt);
     displayResults(captions);
     incrementUsage(); // only count successful generations
@@ -126,33 +145,58 @@ generateBtn.addEventListener('click', async () => {
   }
 });
 
-function buildPrompt(serviceType, platform, briefing, tone, cta) {
+function buildPrompt({ serviceType, platform, briefing, tone, cta, language, length, audience, emojis }) {
   const platformContext = {
-    'instagram': 'Instagram post (2200 char limit)',
-    'instagram-story': 'Instagram Story caption (short & catchy)',
-    'tiktok': 'TikTok caption (hook + message)'
+    'instagram': 'Instagram feed post (max ~2200 chars)',
+    'instagram-story': 'Instagram Story caption (short, punchy)',
+    'tiktok': 'TikTok caption (strong hook first line)'
   }[platform];
 
   const ctaText = {
-    'book': 'Call to action: "Book a session"',
-    'learn': 'Call to action: "Learn more"',
-    'dm': 'Call to action: "DM me"',
-    'link': 'Call to action: "Link in bio"',
-    'none': 'No call to action needed'
+    'book': 'End with a soft invitation to book a session.',
+    'dm': 'End by inviting them to DM Lea.',
+    'link': 'End by pointing to the link in bio.',
+    'whatsapp': 'End by inviting them to message Lea on WhatsApp.',
+    'learn': 'End with a gentle "learn more" nudge.',
+    'save': 'End by inviting them to save the post for later.',
+    'none': 'No call to action.'
   }[cta];
 
-  return `Write 2 ${platformContext} captions. English only.
-Service: ${serviceType}. Brief: ${briefing}. Tone: ${tone}. ${ctaText}.
-Warm, healing voice. A few subtle emojis. ${platform.startsWith('instagram') ? '8-12 English hashtags on a new line.' : 'Hook first line.'}
+  const lengthText = {
+    'short': 'Keep each caption to 1–2 short lines.',
+    'medium': 'Medium length — a few sentences.',
+    'long': 'Longer, storytelling style — a small narrative that draws the reader in.'
+  }[length];
 
-Format exactly:
+  const emojiText = {
+    'subtle': 'Use a few subtle, tasteful emojis.',
+    'none': 'Do not use any emojis.',
+    'expressive': 'Use expressive emojis (still tasteful, on-brand).'
+  }[emojis];
+
+  const hashLine = platform.startsWith('instagram')
+    ? `Add 8–12 relevant hashtags in ${language} on a new line (well-formed, no typos, no other languages mixed in).`
+    : 'No hashtags. Make the first line a scroll-stopping hook.';
+
+  return `${BRAND_VOICE}
+
+TASK: Write 2 distinct ${platformContext} captions in ${language}.
+Topic/service: ${serviceType}.
+Brief from Lea: ${briefing}.
+${audience && audience.trim() ? `Speak to this audience: ${audience.trim()}.` : ''}
+Tone: ${tone} (always within Lea's brand voice above).
+${lengthText} ${emojiText} ${ctaText}
+${hashLine}
+Make the two options genuinely different in angle. Stay true to the brand voice — no medical claims, no hype.
+
+Format your reply EXACTLY like this and nothing else:
 CAPTION 1:
-[text]
-[hashtags]
+[caption text]
+[hashtags line if Instagram]
 
 CAPTION 2:
-[text]
-[hashtags]`;
+[caption text]
+[hashtags line if Instagram]`;
 }
 
 async function generateCaptions(prompt) {
@@ -248,11 +292,12 @@ function escapeHtml(text) {
 function copyCaptionToClipboard(btn, caption, hashtags) {
   const fullText = hashtags ? `${caption}\n\n${hashtags}` : caption;
 
+  const original = btn.textContent;
   const showCopied = () => {
     btn.textContent = '✓ Copied!';
     btn.classList.add('copied');
     setTimeout(() => {
-      btn.textContent = 'Copy Caption';
+      btn.textContent = original;
       btn.classList.remove('copied');
     }, 2000);
   };
@@ -320,86 +365,68 @@ function fallbackCopy(text, onSuccess) {
     });
   }
 
-  // --- Instagram Planner ---
-  const igAdd = document.getElementById('ig_add');
-  const igList = document.getElementById('ig_list');
-  const igNotified = new Set();
+  // --- Image Prompt Generator ---
+  const imageBtn = document.getElementById('imageBtn');
+  const imageResults = document.getElementById('imageResults');
 
-  function loadPlan() { try { return JSON.parse(localStorage.getItem('igPlanner')) || []; } catch (e) { return []; } }
-  function savePlan(a) { localStorage.setItem('igPlanner', JSON.stringify(a)); }
-  function fmtWhen(iso) { return new Date(iso).toLocaleString([], { dateStyle: 'medium', timeStyle: 'short' }); }
+  if (imageBtn) {
+    imageBtn.addEventListener('click', async () => {
+      const subject = document.getElementById('img_subject').value.trim();
+      const format = document.getElementById('img_format').value;
+      const tool = document.getElementById('img_tool').value;
+      const mood = document.getElementById('img_mood').value.trim();
 
-  function renderPlan() {
-    if (!igList) return;
-    const posts = loadPlan().sort((a, b) => new Date(a.when) - new Date(b.when));
-    if (posts.length === 0) { igList.innerHTML = '<div class="empty-state"><p>No posts planned yet</p></div>'; return; }
-    const now = Date.now();
-    igList.innerHTML = posts.map(p => {
-      const due = !p.posted && new Date(p.when).getTime() <= now;
-      const badge = p.posted ? '<span style="color:#5a7d3a">✓ Posted</span>'
-        : due ? '<span style="color:#C57F6A">● Due now</span>'
-          : '<span style="color:#9C8E75">Scheduled</span>';
-      return `<div class="result-card">
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:.6rem;">
-          <strong style="font-size:.85rem;">${fmtWhen(p.when)}</strong>${badge}
-        </div>
-        <div class="result-copy">${escapeHtml(p.caption || '')}</div>
-        ${p.image ? `<p class="result-hashtags">📎 ${escapeHtml(p.image)}</p>` : ''}
-        <div style="display:flex;gap:.5rem;flex-wrap:wrap;margin-top:.6rem;">
-          <button class="copy-btn" data-act="copy" data-id="${p.id}">Copy caption</button>
-          <button class="copy-btn" data-act="open" data-id="${p.id}">Open Instagram</button>
-          <button class="copy-btn" data-act="posted" data-id="${p.id}">${p.posted ? 'Mark not posted' : 'Mark posted'}</button>
-          <button class="copy-btn" data-act="del" data-id="${p.id}">Delete</button>
-        </div>
-      </div>`;
-    }).join('');
-    igList.querySelectorAll('button[data-act]').forEach(b => {
-      b.addEventListener('click', () => planAction(b.dataset.act, b.dataset.id, b));
-    });
-  }
+      if (!subject) { alert('Describe what the image should show.'); return; }
+      if (getRemaining() <= 0) {
+        imageResults.innerHTML = `<div class="empty-state" style="color:#C57F6A;"><p>Daily limit reached</p></div>`;
+        return;
+      }
 
-  function planAction(act, id, btn) {
-    let posts = loadPlan();
-    const p = posts.find(x => x.id === id);
-    if (!p) return;
-    if (act === 'copy') { copyCaptionToClipboard(btn, p.caption || '', ''); return; }
-    if (act === 'open') { window.open('https://www.instagram.com/', '_blank'); return; }
-    if (act === 'posted') { p.posted = !p.posted; savePlan(posts); renderPlan(); return; }
-    if (act === 'del') { posts = posts.filter(x => x.id !== id); savePlan(posts); renderPlan(); return; }
-  }
+      imageBtn.disabled = true;
+      imageBtn.innerHTML = '<span class="loading-spinner"></span>Generating...';
+      imageResults.innerHTML = '';
 
-  if (igAdd) {
-    igAdd.addEventListener('click', () => {
-      const caption = document.getElementById('ig_caption').value.trim();
-      const image = document.getElementById('ig_image').value.trim();
-      const when = document.getElementById('ig_when').value;
-      if (!caption || !when) { alert('Add a caption and a date/time.'); return; }
-      const posts = loadPlan();
-      posts.push({ id: Date.now().toString(), caption, image, when, posted: false });
-      savePlan(posts);
-      document.getElementById('ig_caption').value = '';
-      document.getElementById('ig_image').value = '';
-      document.getElementById('ig_when').value = '';
-      renderPlan();
-    });
-  }
+      const prompt = `${BRAND_VISUAL}
 
-  // Reminders (work while the Hub tab is open)
-  if ('Notification' in window && Notification.permission === 'default') Notification.requestPermission();
-  function checkDue() {
-    const now = Date.now();
-    loadPlan().forEach(p => {
-      if (!p.posted && !igNotified.has(p.id) && new Date(p.when).getTime() <= now) {
-        igNotified.add(p.id);
-        if ('Notification' in window && Notification.permission === 'granted') {
-          new Notification('Time to post on Instagram ✦', { body: (p.caption || '').slice(0, 90) });
-        }
+TASK: Write 2 ready-to-paste image-generation prompts for ${tool}, both in Lea's visual brand above.
+Subject the client wants: ${subject}.
+Format/aspect: ${format}.
+${mood ? `Desired mood: ${mood}.` : ''}
+Each prompt must: describe the scene, subject, lighting, palette, textures, composition and aspect — fully on-brand (warm, calm, natural light, soft neutrals). No text/logos in the image. Photorealistic, editorial wellness style.
+Give 2 different takes. Format EXACTLY:
+PROMPT 1:
+[the full prompt]
+
+PROMPT 2:
+[the full prompt]`;
+
+      try {
+        const res = await fetch('/generate-caption', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ prompt })
+        });
+        if (!res.ok) throw new Error((await res.json()).error || 'Failed');
+        const text = (await res.json()).content;
+        const parts = text.split(/PROMPT \d+:/).map(s => s.trim()).filter(Boolean);
+        imageResults.innerHTML = '';
+        parts.forEach((p, i) => {
+          const card = document.createElement('div');
+          card.className = 'result-card';
+          card.innerHTML = `<h3>Prompt ${i + 1}</h3><div class="result-copy">${escapeHtml(p)}</div><button class="copy-btn" type="button">Copy prompt</button>`;
+          const b = card.querySelector('.copy-btn');
+          b.addEventListener('click', () => copyCaptionToClipboard(b, p, ''));
+          imageResults.appendChild(card);
+        });
+        incrementUsage();
+      } catch (e) {
+        imageResults.innerHTML = `<div class="empty-state" style="color:#C57F6A;"><p>Error: ${e.message}</p></div>`;
+      } finally {
+        imageBtn.disabled = false;
+        imageBtn.innerHTML = 'Generate Image Prompt';
       }
     });
-    renderPlan();
   }
-  setInterval(checkDue, 60000);
-  renderPlan();
 
   // Show today's remaining generations (after all consts are initialized)
   updateUsageDisplay();
