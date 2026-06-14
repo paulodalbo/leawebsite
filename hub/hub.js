@@ -149,35 +149,33 @@ CAPTION 3:
 }
 
 async function generateCaptions(prompt) {
-  const response = await fetch('https://api.anthropic.com/v1/messages', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'x-api-key': API_KEY,
-      'anthropic-version': '2023-06-01'
-    },
-    body: JSON.stringify({
-      model: 'claude-3-5-sonnet-20241022',
-      max_tokens: 1500,
-      messages: [
-        {
-          role: 'user',
-          content: prompt
-        }
-      ]
-    })
-  });
+  try {
+    // Call Netlify Function instead of API directly
+    const response = await fetch('/.netlify/functions/generate-caption', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        prompt: prompt,
+        apiKey: API_KEY
+      })
+    });
 
-  if (!response.ok) {
-    const error = await response.json();
-    throw new Error(error.error?.message || 'Failed to generate captions');
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.error || 'Failed to generate captions');
+    }
+
+    const data = await response.json();
+    const text = data.content;
+
+    // Parse captions from response
+    return parseCaputions(text);
+  } catch (error) {
+    console.error('API Error:', error);
+    throw error;
   }
-
-  const data = await response.json();
-  const text = data.content[0].text;
-
-  // Parse captions from response
-  return parseCaputions(text);
 }
 
 function parseCaputions(text) {
