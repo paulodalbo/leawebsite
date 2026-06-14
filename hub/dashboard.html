@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lea Hub — Website & Instagram Manager</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    :root {
+      --paper: #FCFAF5;
+      --gold: #BCCE6A;
+      --taupe: #9C8E75;
+      --dark: #2A241C;
+      --sage: #8AA3BF;
+      --clay: #C57F6A;
+    }
+    html, body { height: 100%; font-family: 'Figtree', sans-serif; background: var(--paper); color: var(--dark); }
+
+    .hub-container { max-width: 1200px; margin: 0 auto; padding: 2rem; }
+    .hub-header { margin-bottom: 2.4rem; padding-bottom: 1.5rem; border-bottom: 1px solid rgba(188,206,106,.2); }
+    .hub-header h1 { font-size: 2rem; font-weight: 600; margin-bottom: .5rem; }
+    .hub-header p { font-size: .95rem; color: var(--taupe); }
+
+    .hub-nav { display: flex; gap: 1rem; margin-bottom: 2rem; flex-wrap: wrap; }
+    .hub-nav-btn { padding: .7rem 1.4rem; border-radius: 999px; border: 1px solid var(--gold); background: transparent; color: var(--dark); cursor: pointer; font-family: 'Figtree', sans-serif; font-weight: 500; font-size: .9rem; letter-spacing: .03em; transition: all .25s; }
+    .hub-nav-btn.active { background: linear-gradient(100deg, var(--gold), #D4B583); border-color: var(--gold); }
+    .hub-nav-btn:hover:not(.active) { border-color: #BCCE6A; color: #BCCE6A; }
+
+    .hub-section { display: none; }
+    .hub-section.active { display: block; animation: fadeIn .3s ease; }
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+    /* COPY GENERATOR */
+    .copy-form { background: white; border: 1px solid rgba(188,206,106,.15); border-radius: 16px; padding: 2rem; margin-bottom: 2rem; box-shadow: 0 4px 12px rgba(0,0,0,.05); }
+    .form-group { margin-bottom: 1.5rem; }
+    .form-group label { display: block; font-weight: 500; font-size: .95rem; margin-bottom: .6rem; color: var(--dark); }
+    .form-group textarea, .form-group select, .form-group input { width: 100%; padding: .8rem 1rem; border: 1px solid rgba(188,206,106,.25); border-radius: 8px; font-family: 'Figtree', sans-serif; font-size: .95rem; background: #fafaf8; color: var(--dark); transition: border .2s; }
+    .form-group textarea:focus, .form-group select:focus, .form-group input:focus { outline: none; border-color: var(--gold); background: white; }
+    .form-group textarea { resize: vertical; min-height: 100px; }
+
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1.2rem; }
+    @media (max-width: 640px) { .form-row { grid-template-columns: 1fr; } }
+
+    .btn-generate { padding: .95rem 2rem; border-radius: 999px; border: none; background: linear-gradient(100deg, var(--gold), #D4B583); color: var(--dark); cursor: pointer; font-family: 'Figtree', sans-serif; font-weight: 600; font-size: .95rem; letter-spacing: .05em; transition: transform .25s, box-shadow .25s; }
+    .btn-generate:hover { transform: translateY(-2px); box-shadow: 0 12px 30px rgba(188,156,106,.35); }
+    .btn-generate:disabled { opacity: .6; cursor: not-allowed; transform: none; }
+
+    .loading-spinner { display: inline-block; width: 16px; height: 16px; border: 2px solid rgba(42,36,28,.2); border-top-color: var(--dark); border-radius: 50%; animation: spin .8s linear infinite; margin-right: .5rem; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* RESULTS */
+    .copy-results { margin-top: 2rem; }
+    .result-card { background: white; border: 1px solid rgba(188,206,106,.15); border-radius: 16px; padding: 1.6rem; margin-bottom: 1.2rem; box-shadow: 0 2px 8px rgba(0,0,0,.04); }
+    .result-card h3 { font-size: 1rem; font-weight: 600; margin-bottom: .8rem; color: var(--dark); }
+    .result-copy { background: #fafaf8; padding: 1rem; border-radius: 8px; line-height: 1.6; font-size: .95rem; margin-bottom: .8rem; border-left: 3px solid var(--gold); }
+    .result-hashtags { font-size: .85rem; color: var(--taupe); margin-bottom: .8rem; }
+    .result-hashtags span { display: inline-block; background: rgba(188,206,106,.1); padding: .3rem .6rem; border-radius: 4px; margin-right: .4rem; margin-bottom: .4rem; }
+
+    .copy-btn { padding: .5rem 1rem; background: transparent; border: 1px solid var(--gold); border-radius: 6px; color: var(--dark); cursor: pointer; font-size: .85rem; font-weight: 500; transition: all .2s; }
+    .copy-btn:hover { background: rgba(188,206,106,.1); }
+    .copy-btn.copied { background: rgba(138,163,191,.2); border-color: var(--sage); }
+
+    .empty-state { text-align: center; padding: 3rem 2rem; color: var(--taupe); }
+    .empty-state p { font-size: 1.05rem; margin-bottom: .5rem; }
+  </style>
+</head>
+<body>
+  <div class="hub-container">
+    <div class="hub-header">
+      <h1>✦ Lea Hub</h1>
+      <p>Website & Instagram Manager — All your content in one place</p>
+    </div>
+
+    <div class="hub-nav">
+      <button class="hub-nav-btn active" data-section="copy-gen">Copy Generator</button>
+      <button class="hub-nav-btn" data-section="website">Website Manager</button>
+      <button class="hub-nav-btn" data-section="instagram">Instagram Sync</button>
+    </div>
+
+    <!-- COPY GENERATOR SECTION -->
+    <div id="copy-gen" class="hub-section active">
+      <div class="copy-form">
+        <h2 style="font-size: 1.4rem; margin-bottom: 1.5rem; font-weight: 600;">Copy & Caption Generator</h2>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="serviceType">Service / Topic</label>
+            <select id="serviceType">
+              <option value="">Select a service...</option>
+              <option value="biomagnetism-session">Biomagnetism Session</option>
+              <option value="online-session">Online Session</option>
+              <option value="testimonial">Client Testimonial</option>
+              <option value="wellness-tip">Wellness Tip</option>
+              <option value="event">Event Announcement</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="platform">Platform</label>
+            <select id="platform">
+              <option value="instagram">Instagram</option>
+              <option value="instagram-story">Instagram Story</option>
+              <option value="tiktok">TikTok</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="briefing">Your Briefing</label>
+          <textarea id="briefing" placeholder="E.g. New spring session package, energy and calm focus, testimonial from client Maria who loves it, post for next Tuesday..."></textarea>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="tone">Tone</label>
+            <select id="tone">
+              <option value="warm">Warm & Inviting</option>
+              <option value="professional">Professional</option>
+              <option value="playful">Playful</option>
+              <option value="healing">Healing & Calm</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="cta">Call-to-Action</label>
+            <select id="cta">
+              <option value="book">Book a Session</option>
+              <option value="learn">Learn More</option>
+              <option value="dm">DM Me</option>
+              <option value="link">Link in Bio</option>
+              <option value="none">No CTA</option>
+            </select>
+          </div>
+        </div>
+
+        <button class="btn-generate" id="generateBtn">Generate Captions</button>
+      </div>
+
+      <div class="copy-results" id="copyResults"></div>
+    </div>
+
+    <!-- WEBSITE MANAGER (COMING SOON) -->
+    <div id="website" class="hub-section">
+      <div class="empty-state">
+        <p>🔨 Website Manager coming soon</p>
+        <p style="font-size: .9rem;">Edit your site content, images, and services from here.</p>
+      </div>
+    </div>
+
+    <!-- INSTAGRAM SYNC (COMING SOON) -->
+    <div id="instagram" class="hub-section">
+      <div class="empty-state">
+        <p>📱 Instagram Sync coming soon</p>
+        <p style="font-size: .9rem;">Connect your Instagram, view analytics, and schedule posts.</p>
+      </div>
+    </div>
+  </div>
+
+  <script src="hub.js"></script>
+</body>
+</html>
