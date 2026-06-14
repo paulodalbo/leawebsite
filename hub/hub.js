@@ -158,7 +158,7 @@ CAPTION 2:
 async function generateCaptions(prompt) {
   try {
     // Call Netlify Function instead of API directly
-    const response = await fetch('/.netlify/functions/generate-caption', {
+    const response = await fetch('/generate-caption', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
@@ -302,7 +302,7 @@ function fallbackCopy(text, onSuccess) {
       publishStatus.textContent = '';
 
       try {
-        const res = await fetch('/.netlify/functions/update-content', {
+        const res = await fetch('/update-content', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ content })
