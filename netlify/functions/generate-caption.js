@@ -37,10 +37,21 @@ exports.handler = async (event) => {
 
     if (!response.ok) {
       const error = await response.json();
+      console.error('Claude API Error:', error);
+
+      // More detailed error messages
+      let errorMsg = 'Claude API error';
+      if (error.error?.message) {
+        errorMsg = error.error.message;
+      } else if (error.message) {
+        errorMsg = error.message;
+      }
+
       return {
         statusCode: response.status,
         body: JSON.stringify({
-          error: error.error?.message || 'Claude API error'
+          error: `${response.status}: ${errorMsg}`,
+          details: error
         })
       };
     }
