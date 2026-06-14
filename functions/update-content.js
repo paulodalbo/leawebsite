@@ -17,12 +17,18 @@ export async function onRequestPost({ request, env }) {
       'User-Agent': 'lea-hub'
     };
 
-    // Current file SHA (needed to update)
+    // Current file SHA + existing content (needed to update + merge)
     const getRes = await fetch(`${apiBase}?ref=${branch}`, { headers });
-    let sha;
-    if (getRes.ok) sha = (await getRes.json()).sha;
+    let sha, existing = {};
+    if (getRes.ok) {
+      const file = await getRes.json();
+      sha = file.sha;
+      try { existing = JSON.parse(atob(file.content)); } catch (e) { existing = {}; }
+    }
 
-    const newContent = toBase64(JSON.stringify(content, null, 2) + '\n');
+    // Merge so a partial submit never wipes other fields
+    const merged = { ...existing, ...content };
+    const newContent = toBase64(JSON.stringify(merged, null, 2) + '\n');
 
     const putRes = await fetch(apiBase, {
       method: 'PUT',
