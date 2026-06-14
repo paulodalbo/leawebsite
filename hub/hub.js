@@ -9,13 +9,23 @@ VOICE: warm, calm, reassuring, grounded, sensory. Speaks like a trusted, caring 
 LANGUAGE RULES: complementary wellness, NOT medical claims. Never promise to cure or treat disease. Words like "support", "balance", "calm", "ease", "rest" — not "heal disease" or "fix".
 ALWAYS sounds like Lea: soothing, human, a little poetic, deeply respectful of the reader's body and time.`;
 
-const BRAND_VISUAL = `VISUAL BRAND for Lea (biomagnetism, Gold Coast & online):
+const BRAND_VISUAL = `VISUAL BRAND for Lea — BIOMAGNETISM / MAGNET PAIR THERAPY (terapia de ímãs). Gold Coast & online.
+
+WHAT THE THERAPY ACTUALLY LOOKS LIKE (depict it accurately):
+- Small, smooth, round/disc medium-strength magnets — placed in MATCHED PAIRS on the body (commonly one black/dark and one red/terracotta magnet per pair).
+- The client is calm, fully clothed, resting on a treatment bed or relaxing — magnets rest gently on skin or clothing (e.g. forearm, hand, ankle, back, chest area). No needles, no machines, no wires.
+- The practitioner (Lea) places the magnets by hand, unhurried and gentle.
+- Settings: a warm, private, homely studio; or a peaceful online/home setting.
+- It is COMPLEMENTARY WELLNESS, not hospital medicine.
+
+VISUAL STYLE:
 - Mood: serene, warm, editorial wellness, stillness, natural light, intimate and calming.
 - Palette: soft cream/paper (#FCFAF5), warm sand & linen, muted gold (#BC9C6A), gentle clay/terracotta (#C57F6A), soft dusk blue (#8AA3BF), warm taupe browns. Low saturation, warm neutrals.
 - Light: soft diffused natural daylight, golden warmth, gentle shadows. Never harsh, never neon, never cold clinical.
-- Textures: linen, raw cotton, ceramic, warm timber, skin, smooth dark magnets, organic forms.
-- Composition: minimal, airy, lots of negative space, shallow depth of field, calm and uncluttered.
-- Avoid: clinical/medical hospital look, stocky corporate feel, busy backgrounds, harsh flash, oversaturated colors, text overlays.`;
+- Textures: linen, raw cotton, ceramic, warm timber, calm skin, smooth magnets, organic forms.
+- Composition: minimal, airy, generous negative space, shallow depth of field, calm and uncluttered.
+
+AVOID (important): giant horseshoe/U magnets, industrial/sci-fi magnets, glowing or floating magnets, metal filings, clinical hospital/MRI look, lab coats, needles, machines, stock-corporate vibe, busy backgrounds, harsh flash, oversaturated colors, any text/logos/watermarks.`;
 
 // Check password on load
 window.addEventListener('DOMContentLoaded', () => {
@@ -388,11 +398,11 @@ function fallbackCopy(text, onSuccess) {
 
       const prompt = `${BRAND_VISUAL}
 
-TASK: Write 2 ready-to-paste image-generation prompts for ${tool}, both in Lea's visual brand above.
+TASK: Write 2 ready-to-paste image-generation prompts for ${tool}, for Lea's BIOMAGNETISM / magnet pair therapy practice — both faithful to the visual brand AND to how this therapy really looks (see above).
 Subject the client wants: ${subject}.
 Format/aspect: ${format}.
 ${mood ? `Desired mood: ${mood}.` : ''}
-Each prompt must: describe the scene, subject, lighting, palette, textures, composition and aspect — fully on-brand (warm, calm, natural light, soft neutrals). No text/logos in the image. Photorealistic, editorial wellness style.
+Each prompt must: describe the scene, subject, lighting, palette, textures, composition and aspect — fully on-brand (warm, calm, natural light, soft neutrals) and accurate to magnet pair therapy. If magnets appear, they are small smooth discs in matched pairs on a clothed, relaxed body — never giant/industrial/sci-fi magnets. No text/logos in the image. Photorealistic, editorial wellness style.
 Give 2 different takes. Format EXACTLY:
 PROMPT 1:
 [the full prompt]
