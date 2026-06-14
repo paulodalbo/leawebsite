@@ -43,9 +43,6 @@ function initHub() {
   // API key is no longer handled in the browser — it lives securely
   // as a Netlify environment variable (ANTHROPIC_API_KEY).
 
-  // Show today's remaining generations
-  updateUsageDisplay();
-
   // Navigation
 document.querySelectorAll('.hub-nav-btn').forEach(btn => {
   btn.addEventListener('click', () => {
@@ -284,6 +281,9 @@ function fallbackCopy(text, onSuccess) {
   }
   document.body.removeChild(ta);
 }
+
+  // Show today's remaining generations (after all consts are initialized)
+  updateUsageDisplay();
 
   console.log('✦ Lea Hub loaded. Ready to generate amazing captions!');
 }
