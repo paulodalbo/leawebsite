@@ -1,19 +1,61 @@
 // LEA HUB — Copy Generator & Social Manager
 
-const API_KEY = localStorage.getItem('claudeApiKey');
+const HUB_PASSWORD = 'nina3323';
 
-// Check if API key is set
-if (!API_KEY) {
-  const key = prompt('Welcome to Lea Hub!\n\nEnter your Claude API key to get started:\n(Get one at https://console.anthropic.com/account/keys)');
-  if (key) {
-    localStorage.setItem('claudeApiKey', key);
-    location.reload();
+// Check password on load
+window.addEventListener('DOMContentLoaded', () => {
+  const isAuthenticated = sessionStorage.getItem('hubAuthenticated');
+  if (!isAuthenticated) {
+    document.getElementById('loginScreen').style.display = 'flex';
+    document.getElementById('hubContent').style.display = 'none';
   } else {
-    document.body.innerHTML = '<div style="padding: 2rem; text-align: center; font-family: Figtree, sans-serif; color: #2A241C;"><h2>API Key Required</h2><p>You need a Claude API key to use Lea Hub.</p><p><a href="https://console.anthropic.com/account/keys" target="_blank" style="color: #BCCE6A; text-decoration: underline;">Get your key here</a></p></div>';
+    document.getElementById('loginScreen').style.display = 'none';
+    document.getElementById('hubContent').style.display = 'block';
+    initHub();
   }
-}
 
-// Navigation
+  // Allow Enter key to submit password
+  document.getElementById('passwordInput')?.addEventListener('keypress', (e) => {
+    if (e.key === 'Enter') loginHub();
+  });
+});
+
+window.loginHub = function() {
+  const password = document.getElementById('passwordInput').value;
+  if (password === HUB_PASSWORD) {
+    sessionStorage.setItem('hubAuthenticated', 'true');
+    document.getElementById('loginScreen').style.display = 'none';
+    document.getElementById('hubContent').style.display = 'block';
+    initHub();
+  } else {
+    alert('❌ Incorrect password');
+    document.getElementById('passwordInput').value = '';
+    document.getElementById('passwordInput').focus();
+  }
+};
+
+window.logoutHub = function() {
+  sessionStorage.removeItem('hubAuthenticated');
+  localStorage.removeItem('claudeApiKey');
+  location.reload();
+};
+
+function initHub() {
+  let API_KEY = localStorage.getItem('claudeApiKey');
+
+  // Check if API key is set
+  if (!API_KEY) {
+    const key = prompt('Welcome to Lea Hub!\n\nEnter your Claude API key to get started:\n(Get one at https://console.anthropic.com/account/keys)');
+    if (key) {
+      localStorage.setItem('claudeApiKey', key);
+      API_KEY = key;
+    } else {
+      document.getElementById('hubContent').innerHTML = '<div style="padding: 2rem; text-align: center; font-family: Figtree, sans-serif; color: #2A241C;"><h2>API Key Required</h2><p>You need a Claude API key to use Lea Hub.</p><p><a href="https://console.anthropic.com/account/keys" target="_blank" style="color: #BCCE6A; text-decoration: underline;">Get your key here</a></p></div>';
+      return;
+    }
+  }
+
+  // Navigation
 document.querySelectorAll('.hub-nav-btn').forEach(btn => {
   btn.addEventListener('click', () => {
     const section = btn.dataset.section;
@@ -208,4 +250,5 @@ window.copyCaptionToClipboard = function(btn, caption, hashtags) {
   });
 };
 
-console.log('✦ Lea Hub loaded. Ready to generate amazing captions!');
+  console.log('✦ Lea Hub loaded. Ready to generate amazing captions!');
+}

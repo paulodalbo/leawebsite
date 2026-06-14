@@ -19,6 +19,18 @@
     }
     html, body { height: 100%; font-family: 'Figtree', sans-serif; background: var(--paper); color: var(--dark); }
 
+    /* LOGIN SCREEN */
+    .login-screen { position: fixed; inset: 0; background: var(--paper); display: flex; align-items: center; justify-content: center; z-index: 1000; }
+    .login-card { background: white; border: 1px solid rgba(188,206,106,.15); border-radius: 16px; padding: 2.5rem; box-shadow: 0 10px 40px rgba(0,0,0,.08); max-width: 360px; width: 90%; }
+    .login-input { width: 100%; padding: .95rem 1.2rem; border: 1px solid rgba(188,206,106,.25); border-radius: 8px; font-family: 'Figtree', sans-serif; font-size: .95rem; background: #fafaf8; color: var(--dark); transition: border .2s; }
+    .login-input:focus { outline: none; border-color: var(--gold); background: white; }
+    .login-btn { width: 100%; padding: .95rem 1.2rem; border-radius: 999px; border: none; background: linear-gradient(100deg, var(--gold), #D4B583); color: var(--dark); cursor: pointer; font-family: 'Figtree', sans-serif; font-weight: 600; font-size: .95rem; letter-spacing: .05em; transition: transform .25s, box-shadow .25s; }
+    .login-btn:hover { transform: translateY(-2px); box-shadow: 0 12px 30px rgba(188,156,106,.35); }
+    .login-btn:active { transform: translateY(0); }
+
+    .logout-btn { padding: .6rem 1.2rem; background: transparent; border: 1px solid var(--taupe); border-radius: 6px; color: var(--taupe); cursor: pointer; font-family: 'Figtree', sans-serif; font-size: .85rem; font-weight: 500; transition: all .2s; }
+    .logout-btn:hover { border-color: var(--dark); color: var(--dark); }
+
     .hub-container { max-width: 1200px; margin: 0 auto; padding: 2rem; }
     .hub-header { margin-bottom: 2.4rem; padding-bottom: 1.5rem; border-bottom: 1px solid rgba(188,206,106,.2); }
     .hub-header h1 { font-size: 2rem; font-weight: 600; margin-bottom: .5rem; }
@@ -68,13 +80,33 @@
   </style>
 </head>
 <body>
-  <div class="hub-container">
-    <div class="hub-header">
-      <h1>✦ Lea Hub</h1>
-      <p>Website & Instagram Manager — All your content in one place</p>
+  <div id="loginScreen" class="login-screen">
+    <div class="login-card">
+      <div style="text-align: center; margin-bottom: 2rem;">
+        <h1 style="font-size: 1.8rem; margin-bottom: .5rem;">✦ Lea Hub</h1>
+        <p style="color: #9C8E75; font-size: .95rem;">Content & Social Manager</p>
+      </div>
+      <div style="margin-bottom: 1.2rem;">
+        <input type="password" id="passwordInput" placeholder="Enter password" class="login-input">
+      </div>
+      <button onclick="loginHub()" class="login-btn">Enter</button>
+      <p style="text-align: center; color: #9C8E75; font-size: .85rem; margin-top: 1rem;">Password required</p>
     </div>
+  </div>
 
-    <div class="hub-nav">
+  <div id="hubContent" class="hub-content" style="display: none;">
+    <div class="hub-container">
+      <div class="hub-header">
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+          <div>
+            <h1>✦ Lea Hub</h1>
+            <p>Website & Instagram Manager — All your content in one place</p>
+          </div>
+          <button onclick="logoutHub()" class="logout-btn">Logout</button>
+        </div>
+      </div>
+
+      <div class="hub-nav">
       <button class="hub-nav-btn active" data-section="copy-gen">Copy Generator</button>
       <button class="hub-nav-btn" data-section="website">Website Manager</button>
       <button class="hub-nav-btn" data-section="instagram">Instagram Sync</button>
@@ -153,6 +185,7 @@
       <div class="empty-state">
         <p>📱 Instagram Sync coming soon</p>
         <p style="font-size: .9rem;">Connect your Instagram, view analytics, and schedule posts.</p>
+      </div>
       </div>
     </div>
   </div>
