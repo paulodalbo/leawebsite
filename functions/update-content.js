@@ -23,7 +23,7 @@ export async function onRequestPost({ request, env }) {
     if (getRes.ok) {
       const file = await getRes.json();
       sha = file.sha;
-      try { existing = JSON.parse(atob(file.content)); } catch (e) { existing = {}; }
+      try { existing = JSON.parse(fromBase64(file.content)); } catch (e) { existing = {}; }
     }
 
     // Merge so a partial submit never wipes other fields
@@ -57,6 +57,12 @@ function toBase64(str) {
   let bin = '';
   for (const b of bytes) bin += String.fromCharCode(b);
   return btoa(bin);
+}
+
+function fromBase64(b64) {
+  const bin = atob(b64.replace(/\s/g, ''));
+  const bytes = Uint8Array.from(bin, c => c.charCodeAt(0));
+  return new TextDecoder().decode(bytes);
 }
 
 function json(obj, status = 200) {
