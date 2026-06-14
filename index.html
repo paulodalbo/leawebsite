@@ -842,10 +842,10 @@ html.js .reveal.in{opacity:1;transform:none}
   <div class="wrap about-grid">
     <div class="about-photo reveal"><img src="images/hero-lea.jpg" loading="lazy" alt="Lea, certified biomagnetism practitioner"></div>
     <div class="reveal">
-      <span class="eyebrow">About Lea</span>
-      <h2>Listening first.<br>Magnets second.</h2>
-      <p>Lea is a certified biomagnetism practitioner attending clients in person on the Gold Coast and online around the world. Her sessions are unhurried and deeply personal — built on the belief that the body responds best when it feels safe and heard.</p>
-      <p>Trained in biomagnetic pair therapy, she pairs a methodical scanning technique with genuine warmth, so every placement is chosen for you, never from a script.</p>
+      <span class="eyebrow" data-content="about_eyebrow">About Lea</span>
+      <h2><span data-content="about_title_1">Listening first.</span><br><span data-content="about_title_2">Magnets second.</span></h2>
+      <p data-content="about_p1">Lea is a certified biomagnetism practitioner attending clients in person on the Gold Coast and online around the world. Her sessions are unhurried and deeply personal — built on the belief that the body responds best when it feels safe and heard.</p>
+      <p data-content="about_p2">Trained in biomagnetic pair therapy, she pairs a methodical scanning technique with genuine warmth, so every placement is chosen for you, never from a script.</p>
       <div class="sig">Lea</div>
     </div>
   </div>
@@ -853,9 +853,9 @@ html.js .reveal.in{opacity:1;transform:none}
 
 <section class="cta-final" id="book">
   <div class="wrap">
-    <span class="eyebrow">Begin here</span>
-    <h2>Give your body an hour it will <em>thank you for</em></h2>
-    <p>Choose online or the Gold Coast studio — your first session includes a full personal scan.</p>
+    <span class="eyebrow" data-content="book_eyebrow">Begin here</span>
+    <h2><span data-content="book_title_1">Give your body an hour it will </span><em data-content="book_title_2">thank you for</em></h2>
+    <p data-content="book_p">Choose online or the Gold Coast studio — your first session includes a full personal scan.</p>
     <div class="hero-ctas">
       <a href="#" class="btn btn-gold js-book" data-type="general">Open booking calendar</a>
       <a href="#" class="btn btn-line js-whatsapp">Message Lea on WhatsApp</a>
@@ -876,18 +876,18 @@ html.js .reveal.in{opacity:1;transform:none}
 
 <script>
 /* ========= EDIT THESE THREE LINES ONLY ========= */
-const BOOKING_URL = "https://calendly.com/YOUR-LINK";        // Lea's Calendly / Fresha / Halaxy link
-const WHATSAPP    = "61400000000";                            // country code + number, digits only
-const EMAIL       = "hello@example.com";                      // Lea's email
+let BOOKING_URL = "https://calendly.com/YOUR-LINK";          // Lea's Calendly / Fresha / Halaxy link
+let WHATSAPP    = "61400000000";                              // country code + number, digits only
+let EMAIL       = "hello@example.com";                        // Lea's email
 /* =============================================== */
 
-document.querySelectorAll('.js-book').forEach(a=>{
-  a.href = BOOKING_URL;
-  a.target = "_blank"; a.rel = "noopener";
-});
-const waMsg = encodeURIComponent("Hi Lea! I found your website and I'd like to book a biomagnetism session.");
-document.querySelectorAll('.js-whatsapp').forEach(a=>{ a.href = `https://wa.me/${WHATSAPP}?text=${waMsg}`; a.target="_blank"; a.rel="noopener"; });
-document.querySelectorAll('.js-email').forEach(a=>{ a.href = `mailto:${EMAIL}`; a.textContent = EMAIL; });
+function wireContactLinks(){
+  document.querySelectorAll('.js-book').forEach(a=>{ a.href = BOOKING_URL; a.target="_blank"; a.rel="noopener"; });
+  const waMsg = encodeURIComponent("Hi Lea! I found your website and I'd like to book a biomagnetism session.");
+  document.querySelectorAll('.js-whatsapp').forEach(a=>{ a.href = `https://wa.me/${WHATSAPP}?text=${waMsg}`; a.target="_blank"; a.rel="noopener"; });
+  document.querySelectorAll('.js-email').forEach(a=>{ a.href = `mailto:${EMAIL}`; a.textContent = EMAIL; });
+}
+wireContactLinks();
 
 /* ---------- placement map ---------- */
 const zones = [
@@ -1262,6 +1262,11 @@ fetch('content.json?v=' + Date.now()).then(r => r.ok ? r.json() : null).then(c =
     const key = el.dataset.content;
     if (c[key] != null && c[key] !== '') el.textContent = c[key];
   });
+  // Contact links
+  if (c.booking_url) BOOKING_URL = c.booking_url;
+  if (c.whatsapp) WHATSAPP = c.whatsapp;
+  if (c.email) EMAIL = c.email;
+  if (typeof wireContactLinks === 'function') wireContactLinks();
 }).catch(() => {});
 </script>
 </body>

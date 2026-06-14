@@ -176,7 +176,9 @@
     <!-- WEBSITE MANAGER (COMING SOON) -->
     <div id="website" class="hub-section">
       <div class="copy-form">
-        <h2 style="font-size: 1.4rem; margin-bottom: 1.5rem; font-weight: 600;">Website — Hero Section</h2>
+        <h2 style="font-size: 1.4rem; margin-bottom: 1.5rem; font-weight: 600;">Website Content</h2>
+
+        <h3 style="font-size: 1rem; margin: 0 0 1rem; color: #BCCE6A;">Hero (top of page)</h3>
 
         <div class="form-group">
           <label for="hero_eyebrow">Eyebrow (small label)</label>
@@ -207,7 +209,67 @@
           </div>
         </div>
 
-        <button class="btn-generate" id="publishBtn">Publish to website</button>
+        <h3 style="font-size: 1rem; margin: 2rem 0 1rem; color: #BCCE6A; border-top: 1px solid rgba(188,206,106,.15); padding-top: 1.5rem;">About</h3>
+        <div class="form-group">
+          <label for="about_eyebrow">Eyebrow</label>
+          <input type="text" id="about_eyebrow" data-field="about_eyebrow">
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="about_title_1">Title line 1</label>
+            <input type="text" id="about_title_1" data-field="about_title_1">
+          </div>
+          <div class="form-group">
+            <label for="about_title_2">Title line 2</label>
+            <input type="text" id="about_title_2" data-field="about_title_2">
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="about_p1">Paragraph 1</label>
+          <textarea id="about_p1" data-field="about_p1"></textarea>
+        </div>
+        <div class="form-group">
+          <label for="about_p2">Paragraph 2</label>
+          <textarea id="about_p2" data-field="about_p2"></textarea>
+        </div>
+
+        <h3 style="font-size: 1rem; margin: 2rem 0 1rem; color: #BCCE6A; border-top: 1px solid rgba(188,206,106,.15); padding-top: 1.5rem;">Booking section (bottom)</h3>
+        <div class="form-group">
+          <label for="book_eyebrow">Eyebrow</label>
+          <input type="text" id="book_eyebrow" data-field="book_eyebrow">
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="book_title_1">Title (start)</label>
+            <input type="text" id="book_title_1" data-field="book_title_1">
+          </div>
+          <div class="form-group">
+            <label for="book_title_2">Title (italic end)</label>
+            <input type="text" id="book_title_2" data-field="book_title_2">
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="book_p">Paragraph</label>
+          <textarea id="book_p" data-field="book_p"></textarea>
+        </div>
+
+        <h3 style="font-size: 1rem; margin: 2rem 0 1rem; color: #BCCE6A; border-top: 1px solid rgba(188,206,106,.15); padding-top: 1.5rem;">Contact & Booking links</h3>
+        <div class="form-group">
+          <label for="booking_url">Booking link (Calendly / Fresha)</label>
+          <input type="text" id="booking_url" data-field="booking_url" placeholder="https://calendly.com/your-link">
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="whatsapp">WhatsApp (digits only, with country code)</label>
+            <input type="text" id="whatsapp" data-field="whatsapp" placeholder="61400000000">
+          </div>
+          <div class="form-group">
+            <label for="email">Email</label>
+            <input type="text" id="email" data-field="email" placeholder="hello@example.com">
+          </div>
+        </div>
+
+        <button class="btn-generate" id="publishBtn" style="margin-top: 1rem;">Publish to website</button>
         <p id="publishStatus" style="margin-top: 1rem; font-size: .9rem;"></p>
       </div>
     </div>
