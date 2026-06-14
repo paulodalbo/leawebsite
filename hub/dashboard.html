@@ -217,11 +217,32 @@
     <div id="image-gen" class="hub-section">
       <div class="copy-form">
         <h2 style="font-size: 1.4rem; margin-bottom: 1.5rem; font-weight: 600;">Image Prompt Generator</h2>
-        <p style="font-size:.85rem; color:#9C8E75; margin-bottom:1.5rem;">Generates a ready-to-paste prompt in Lea's brand style. Use it in Midjourney, DALL·E, Higgsfield, Leonardo, etc.</p>
+        <p style="font-size:.85rem; color:#9C8E75; margin-bottom:1.5rem;">Creates ready-to-paste prompts in Lea's brand style. Tip: generate, then make 3–4 variations in your image tool and pick the best.</p>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="img_mode">Mode</label>
+            <select id="img_mode">
+              <option value="restyle">Restyle MY photo (best — most accurate & on-brand)</option>
+              <option value="scratch">Generate from scratch</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="img_type">Image type</label>
+            <select id="img_type">
+              <option value="still-life">Still life / objects (magnets, ceramics)</option>
+              <option value="texture">Texture / background</option>
+              <option value="hands">Hands in detail (placing magnets)</option>
+              <option value="studio">Studio / environment</option>
+              <option value="quote-bg">Background for a quote card</option>
+              <option value="portrait">Portrait of a person</option>
+            </select>
+          </div>
+        </div>
 
         <div class="form-group">
-          <label for="img_subject">What should the image show?</label>
-          <textarea id="img_subject" placeholder="e.g. magnets resting on a forearm in soft light; Lea's calm studio; a client relaxing on a treatment bed"></textarea>
+          <label for="img_subject">Describe the shot</label>
+          <textarea id="img_subject" placeholder="e.g. a matched pair of magnets resting on folded linen; close-up of hands placing a magnet on a forearm; the calm studio corner with soft morning light"></textarea>
         </div>
         <div class="form-row">
           <div class="form-group">
@@ -251,6 +272,7 @@
         </div>
 
         <button class="btn-generate" id="imageBtn">Generate Image Prompt</button>
+        <p id="img_tip" style="margin-top:.8rem; font-size:.8rem; color:#9C8E75;"></p>
       </div>
       <div class="copy-results" id="imageResults"></div>
     </div>

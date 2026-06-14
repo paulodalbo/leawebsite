@@ -25,7 +25,12 @@ VISUAL STYLE:
 - Textures: linen, raw cotton, ceramic, warm timber, calm skin, smooth magnets, organic forms.
 - Composition: minimal, airy, generous negative space, shallow depth of field, calm and uncluttered.
 
+PHOTOGRAPHY SPECS (bake into prompts): shot on a 50mm or 85mm lens, shallow depth of field (f/1.8–2.8), soft window light, gentle film-like color, fine natural grain, realistic skin and textures, editorial wellness magazine quality.
+
 AVOID (important): giant horseshoe/U magnets, industrial/sci-fi magnets, glowing or floating magnets, metal filings, clinical hospital/MRI look, lab coats, needles, machines, stock-corporate vibe, busy backgrounds, harsh flash, oversaturated colors, any text/logos/watermarks.`;
+
+// A short, fixed style suffix the client can reuse on EVERY post for a cohesive feed.
+const STYLE_LOCK = 'warm cream & soft gold palette, gentle natural window light, shallow depth of field, calm editorial wellness aesthetic, film-like grain, minimal and airy';
 
 // Check password on load
 window.addEventListener('DOMContentLoaded', () => {
@@ -385,8 +390,10 @@ function fallbackCopy(text, onSuccess) {
       const format = document.getElementById('img_format').value;
       const tool = document.getElementById('img_tool').value;
       const mood = document.getElementById('img_mood').value.trim();
+      const mode = document.getElementById('img_mode').value;
+      const type = document.getElementById('img_type').value;
 
-      if (!subject) { alert('Describe what the image should show.'); return; }
+      if (!subject) { alert('Describe the shot.'); return; }
       if (getRemaining() <= 0) {
         imageResults.innerHTML = `<div class="empty-state" style="color:#C57F6A;"><p>Daily limit reached</p></div>`;
         return;
@@ -396,17 +403,37 @@ function fallbackCopy(text, onSuccess) {
       imageBtn.innerHTML = '<span class="loading-spinner"></span>Generating...';
       imageResults.innerHTML = '';
 
+      const typeText = {
+        'still-life': 'A still-life / object shot (no people). This is where AI excels — lean into it.',
+        'texture': 'A texture / abstract background — soft, tactile, lots of negative space.',
+        'hands': 'A close, cropped detail of hands placing a small magnet — crop tight, hands partially out of frame to avoid AI hand errors.',
+        'studio': 'An empty calm studio / environment shot (no people, or person far and out of focus).',
+        'quote-bg': 'A soft, mostly-empty background designed to hold a text quote on top — keep the centre calm and uncluttered.',
+        'portrait': 'A portrait of a person. WARNING: pure AI people look generic and can hurt an authentic personal brand — strongly prefer Restyle mode with a real photo.'
+      }[type];
+
+      const restyle = mode === 'restyle';
+      const supportsRef = /Nano Banana|ChatGPT|Leonardo/i.test(tool);
+
+      const modeBlock = restyle
+        ? `MODE: RESTYLE THE CLIENT'S OWN PHOTO (image-to-image). The client will ATTACH a real photo (of the magnets, hands, studio, or themselves) to ${tool}. Write the prompt as an EDIT/RESTYLE INSTRUCTION that keeps the real subject/identity from the attached photo and only restyles light, color grade, palette, mood and finish to the brand. Do NOT invent new people or new magnets — preserve what's in their photo. ${supportsRef ? `(${tool} supports attaching a reference image — perfect for this.)` : `(Note: ${tool} has limited image-editing — for best results use Nano Banana Pro or ChatGPT in this mode; still, write it as a restyle instruction.)`}`
+        : `MODE: GENERATE FROM SCRATCH (text-to-image). No reference photo.`;
+
       const prompt = `${BRAND_VISUAL}
 
-TASK: Write 2 ready-to-paste image-generation prompts for ${tool}, for Lea's BIOMAGNETISM / magnet pair therapy practice — both faithful to the visual brand AND to how this therapy really looks (see above).
-Subject the client wants: ${subject}.
+${modeBlock}
+
+TASK: Write 2 ready-to-paste ${restyle ? 'restyle instructions' : 'image-generation prompts'} for ${tool}, for Lea's BIOMAGNETISM / magnet pair therapy practice — faithful to the visual brand AND to how this therapy really looks.
+Image type: ${typeText}
+What the client describes: ${subject}.
 Format/aspect: ${format}.
 ${mood ? `Desired mood: ${mood}.` : ''}
-Each prompt must: describe the scene, subject, lighting, palette, textures, composition and aspect — fully on-brand (warm, calm, natural light, soft neutrals) and accurate to magnet pair therapy. If magnets appear, they are small smooth discs in matched pairs on a clothed, relaxed body — never giant/industrial/sci-fi magnets. No text/logos in the image. Photorealistic, editorial wellness style.
+Each must cover: subject, lighting, palette, textures, composition, lens/depth and aspect — fully on-brand. If magnets appear, they are small smooth discs in matched pairs on a clothed, relaxed body — never giant/industrial/sci-fi magnets. No text/logos/watermarks. Photorealistic editorial wellness style.
+End every prompt with this exact STYLE LOCK so the client's feed stays cohesive: "${STYLE_LOCK}".
 
 ALSO give a NEGATIVE prompt for each, adapted to ${tool}:
-- If ${tool} supports negative prompts (Midjourney, Leonardo, Stable Diffusion): give a comma-separated list of things to avoid (e.g. giant magnets, horseshoe magnet, industrial, sci-fi, glowing, clinical hospital, lab coat, needles, machine, wires, text, watermark, logo, oversaturated, harsh flash, deformed hands, extra fingers).
-- If ${tool} does NOT support negative prompts (Nano Banana Pro, ChatGPT): the main prompt should already fold the avoidances into natural language, and the negative line should read: "Not supported by ${tool} — avoidances already included in the prompt above."
+- If ${tool} supports negative prompts (Midjourney, Leonardo): comma-separated list of things to avoid (giant magnets, horseshoe magnet, industrial, sci-fi, glowing, clinical hospital, lab coat, needles, machine, wires, text, watermark, logo, oversaturated, harsh flash, deformed hands, extra fingers).
+- If ${tool} does NOT (Nano Banana Pro, ChatGPT): fold avoidances into the main prompt and set the negative line to: "Not supported by ${tool} — avoidances already included in the prompt above."
 
 Give 2 different takes. Format EXACTLY:
 PROMPT 1:
@@ -428,7 +455,9 @@ NEGATIVE 2:
         if (!res.ok) throw new Error((await res.json()).error || 'Failed');
         const text = (await res.json()).content;
         const blocks = text.split(/PROMPT \d+:/).map(s => s.trim()).filter(Boolean);
-        imageResults.innerHTML = '';
+        imageResults.innerHTML = restyle
+          ? `<div class="result-card" style="border-left:3px solid #BCCE6A;"><strong>📎 Restyle mode:</strong> open ${escapeHtml(tool)}, <strong>attach your real photo</strong>, then paste the prompt below.</div>`
+          : '';
         blocks.forEach((block, i) => {
           const m = block.split(/NEGATIVE \d+:/);
           const promptText = m[0].trim();
@@ -459,6 +488,24 @@ NEGATIVE 2:
         imageBtn.innerHTML = 'Generate Image Prompt';
       }
     });
+
+    // Dynamic helper tip under the button
+    const imgTip = document.getElementById('img_tip');
+    const imgMode = document.getElementById('img_mode');
+    const imgType = document.getElementById('img_type');
+    function updateImgTip() {
+      if (!imgTip) return;
+      if (imgMode.value === 'restyle') {
+        imgTip.textContent = '✦ Best results: snap a real photo (magnets, hands, studio) and attach it in your image tool — the prompt only restyles it on-brand.';
+      } else if (imgType.value === 'portrait') {
+        imgTip.textContent = '⚠ AI-generated people look generic and can feel inauthentic. Consider Restyle mode with a real photo instead.';
+      } else {
+        imgTip.textContent = '✦ Tip: object, texture and studio shots get the best AI results. Generate 3–4 variations and pick the best.';
+      }
+    }
+    imgMode.addEventListener('change', updateImgTip);
+    imgType.addEventListener('change', updateImgTip);
+    updateImgTip();
   }
 
   // Show today's remaining generations (after all consts are initialized)
