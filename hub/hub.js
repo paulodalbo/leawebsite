@@ -403,12 +403,21 @@ Subject the client wants: ${subject}.
 Format/aspect: ${format}.
 ${mood ? `Desired mood: ${mood}.` : ''}
 Each prompt must: describe the scene, subject, lighting, palette, textures, composition and aspect — fully on-brand (warm, calm, natural light, soft neutrals) and accurate to magnet pair therapy. If magnets appear, they are small smooth discs in matched pairs on a clothed, relaxed body — never giant/industrial/sci-fi magnets. No text/logos in the image. Photorealistic, editorial wellness style.
+
+ALSO give a NEGATIVE prompt for each, adapted to ${tool}:
+- If ${tool} supports negative prompts (Midjourney, Leonardo, Stable Diffusion): give a comma-separated list of things to avoid (e.g. giant magnets, horseshoe magnet, industrial, sci-fi, glowing, clinical hospital, lab coat, needles, machine, wires, text, watermark, logo, oversaturated, harsh flash, deformed hands, extra fingers).
+- If ${tool} does NOT support negative prompts (Nano Banana Pro, ChatGPT): the main prompt should already fold the avoidances into natural language, and the negative line should read: "Not supported by ${tool} — avoidances already included in the prompt above."
+
 Give 2 different takes. Format EXACTLY:
 PROMPT 1:
 [the full prompt]
+NEGATIVE 1:
+[negative prompt or the not-supported note]
 
 PROMPT 2:
-[the full prompt]`;
+[the full prompt]
+NEGATIVE 2:
+[negative prompt or the not-supported note]`;
 
       try {
         const res = await fetch('/generate-caption', {
@@ -418,14 +427,28 @@ PROMPT 2:
         });
         if (!res.ok) throw new Error((await res.json()).error || 'Failed');
         const text = (await res.json()).content;
-        const parts = text.split(/PROMPT \d+:/).map(s => s.trim()).filter(Boolean);
+        const blocks = text.split(/PROMPT \d+:/).map(s => s.trim()).filter(Boolean);
         imageResults.innerHTML = '';
-        parts.forEach((p, i) => {
+        blocks.forEach((block, i) => {
+          const m = block.split(/NEGATIVE \d+:/);
+          const promptText = m[0].trim();
+          const negText = (m[1] || '').trim();
           const card = document.createElement('div');
           card.className = 'result-card';
-          card.innerHTML = `<h3>Prompt ${i + 1}</h3><div class="result-copy">${escapeHtml(p)}</div><button class="copy-btn" type="button">Copy prompt</button>`;
-          const b = card.querySelector('.copy-btn');
-          b.addEventListener('click', () => copyCaptionToClipboard(b, p, ''));
+          card.innerHTML = `
+            <h3>Option ${i + 1}</h3>
+            <div style="font-size:.75rem;letter-spacing:.08em;text-transform:uppercase;color:#9C8E75;margin-bottom:.3rem;">Prompt</div>
+            <div class="result-copy">${escapeHtml(promptText)}</div>
+            <button class="copy-btn" type="button" data-role="prompt">Copy prompt</button>
+            ${negText ? `
+            <div style="font-size:.75rem;letter-spacing:.08em;text-transform:uppercase;color:#9C8E75;margin:1rem 0 .3rem;">Negative prompt</div>
+            <div class="result-copy" style="border-left-color:#C57F6A;">${escapeHtml(negText)}</div>
+            <button class="copy-btn" type="button" data-role="neg">Copy negative</button>` : ''}
+          `;
+          const pb = card.querySelector('[data-role="prompt"]');
+          pb.addEventListener('click', () => copyCaptionToClipboard(pb, promptText, ''));
+          const nb = card.querySelector('[data-role="neg"]');
+          if (nb) nb.addEventListener('click', () => copyCaptionToClipboard(nb, negText, ''));
           imageResults.appendChild(card);
         });
         incrementUsage();
