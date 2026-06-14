@@ -105,35 +105,18 @@ function buildPrompt(serviceType, platform, briefing, tone, cta) {
     'none': 'No call to action needed'
   }[cta];
 
-  return `You are Lea's social media copywriter. Create 3 highly engaging captions for a ${platformContext}.
+  return `Write 2 ${platformContext} captions. English only.
+Service: ${serviceType}. Brief: ${briefing}. Tone: ${tone}. ${ctaText}.
+Warm, healing voice. A few subtle emojis. ${platform.startsWith('instagram') ? '8-12 English hashtags on a new line.' : 'Hook first line.'}
 
-Service: ${serviceType}
-Briefing: ${briefing}
-Tone: ${tone} and authentic
-${ctaText}
-
-Important guidelines:
-- Use Lea's voice: warm, professional, healing-focused
-- Include relevant emojis (subtle, not overdone)
-- For Instagram: add 10-15 relevant hashtags on a new line
-- For TikTok: hook in first line, then deliver message
-- Each caption should feel unique and distinct
-- Respect platform character limits
-- Make it shareable and inspirational
-
-Format your response as:
-
+Format exactly:
 CAPTION 1:
-[caption text]
-[hashtags if Instagram]
+[text]
+[hashtags]
 
 CAPTION 2:
-[caption text]
-[hashtags if Instagram]
-
-CAPTION 3:
-[caption text]
-[hashtags if Instagram]`;
+[text]
+[hashtags]`;
 }
 
 async function generateCaptions(prompt) {
