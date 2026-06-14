@@ -368,10 +368,24 @@
 
     <!-- INSTAGRAM SYNC (COMING SOON) -->
     <div id="instagram" class="hub-section">
-      <div class="empty-state">
-        <p>📱 Instagram Sync coming soon</p>
-        <p style="font-size: .9rem;">Connect your Instagram, view analytics, and schedule posts.</p>
+      <div class="copy-form">
+        <h2 style="font-size: 1.4rem; margin-bottom: 1.5rem; font-weight: 600;">Instagram Planner</h2>
+        <div class="form-group">
+          <label for="ig_caption">Caption</label>
+          <textarea id="ig_caption" placeholder="Paste a caption from the generator, or write one..."></textarea>
+        </div>
+        <div class="form-group">
+          <label for="ig_image">Image / video reference (optional)</label>
+          <input type="text" id="ig_image" placeholder="Image URL, or a note like 'sunset studio reel'">
+        </div>
+        <div class="form-group">
+          <label for="ig_when">When to post</label>
+          <input type="datetime-local" id="ig_when">
+        </div>
+        <button class="btn-generate" id="ig_add">Add to plan</button>
+        <p style="margin-top:.8rem; font-size:.8rem; color:#9C8E75;">You'll get a reminder when a post is due (keep the Hub open in a tab). At post time: Copy caption → Open Instagram → paste & post.</p>
       </div>
+      <div id="ig_list"></div>
       </div>
     </div>
   </div>

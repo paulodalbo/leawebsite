@@ -320,6 +320,87 @@ function fallbackCopy(text, onSuccess) {
     });
   }
 
+  // --- Instagram Planner ---
+  const igAdd = document.getElementById('ig_add');
+  const igList = document.getElementById('ig_list');
+  const igNotified = new Set();
+
+  function loadPlan() { try { return JSON.parse(localStorage.getItem('igPlanner')) || []; } catch (e) { return []; } }
+  function savePlan(a) { localStorage.setItem('igPlanner', JSON.stringify(a)); }
+  function fmtWhen(iso) { return new Date(iso).toLocaleString([], { dateStyle: 'medium', timeStyle: 'short' }); }
+
+  function renderPlan() {
+    if (!igList) return;
+    const posts = loadPlan().sort((a, b) => new Date(a.when) - new Date(b.when));
+    if (posts.length === 0) { igList.innerHTML = '<div class="empty-state"><p>No posts planned yet</p></div>'; return; }
+    const now = Date.now();
+    igList.innerHTML = posts.map(p => {
+      const due = !p.posted && new Date(p.when).getTime() <= now;
+      const badge = p.posted ? '<span style="color:#5a7d3a">✓ Posted</span>'
+        : due ? '<span style="color:#C57F6A">● Due now</span>'
+          : '<span style="color:#9C8E75">Scheduled</span>';
+      return `<div class="result-card">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:.6rem;">
+          <strong style="font-size:.85rem;">${fmtWhen(p.when)}</strong>${badge}
+        </div>
+        <div class="result-copy">${escapeHtml(p.caption || '')}</div>
+        ${p.image ? `<p class="result-hashtags">📎 ${escapeHtml(p.image)}</p>` : ''}
+        <div style="display:flex;gap:.5rem;flex-wrap:wrap;margin-top:.6rem;">
+          <button class="copy-btn" data-act="copy" data-id="${p.id}">Copy caption</button>
+          <button class="copy-btn" data-act="open" data-id="${p.id}">Open Instagram</button>
+          <button class="copy-btn" data-act="posted" data-id="${p.id}">${p.posted ? 'Mark not posted' : 'Mark posted'}</button>
+          <button class="copy-btn" data-act="del" data-id="${p.id}">Delete</button>
+        </div>
+      </div>`;
+    }).join('');
+    igList.querySelectorAll('button[data-act]').forEach(b => {
+      b.addEventListener('click', () => planAction(b.dataset.act, b.dataset.id, b));
+    });
+  }
+
+  function planAction(act, id, btn) {
+    let posts = loadPlan();
+    const p = posts.find(x => x.id === id);
+    if (!p) return;
+    if (act === 'copy') { copyCaptionToClipboard(btn, p.caption || '', ''); return; }
+    if (act === 'open') { window.open('https://www.instagram.com/', '_blank'); return; }
+    if (act === 'posted') { p.posted = !p.posted; savePlan(posts); renderPlan(); return; }
+    if (act === 'del') { posts = posts.filter(x => x.id !== id); savePlan(posts); renderPlan(); return; }
+  }
+
+  if (igAdd) {
+    igAdd.addEventListener('click', () => {
+      const caption = document.getElementById('ig_caption').value.trim();
+      const image = document.getElementById('ig_image').value.trim();
+      const when = document.getElementById('ig_when').value;
+      if (!caption || !when) { alert('Add a caption and a date/time.'); return; }
+      const posts = loadPlan();
+      posts.push({ id: Date.now().toString(), caption, image, when, posted: false });
+      savePlan(posts);
+      document.getElementById('ig_caption').value = '';
+      document.getElementById('ig_image').value = '';
+      document.getElementById('ig_when').value = '';
+      renderPlan();
+    });
+  }
+
+  // Reminders (work while the Hub tab is open)
+  if ('Notification' in window && Notification.permission === 'default') Notification.requestPermission();
+  function checkDue() {
+    const now = Date.now();
+    loadPlan().forEach(p => {
+      if (!p.posted && !igNotified.has(p.id) && new Date(p.when).getTime() <= now) {
+        igNotified.add(p.id);
+        if ('Notification' in window && Notification.permission === 'granted') {
+          new Notification('Time to post on Instagram ✦', { body: (p.caption || '').slice(0, 90) });
+        }
+      }
+    });
+    renderPlan();
+  }
+  setInterval(checkDue, 60000);
+  renderPlan();
+
   // Show today's remaining generations (after all consts are initialized)
   updateUsageDisplay();
 
