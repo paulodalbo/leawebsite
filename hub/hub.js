@@ -36,24 +36,12 @@ window.loginHub = function() {
 
 window.logoutHub = function() {
   sessionStorage.removeItem('hubAuthenticated');
-  localStorage.removeItem('claudeApiKey');
   location.reload();
 };
 
 function initHub() {
-  let API_KEY = localStorage.getItem('claudeApiKey');
-
-  // Check if API key is set
-  if (!API_KEY) {
-    const key = prompt('Welcome to Lea Hub!\n\nEnter your Claude API key to get started:\n(Get one at https://console.anthropic.com/account/keys)');
-    if (key) {
-      localStorage.setItem('claudeApiKey', key);
-      API_KEY = key;
-    } else {
-      document.getElementById('hubContent').innerHTML = '<div style="padding: 2rem; text-align: center; font-family: Figtree, sans-serif; color: #2A241C;"><h2>API Key Required</h2><p>You need a Claude API key to use Lea Hub.</p><p><a href="https://console.anthropic.com/account/keys" target="_blank" style="color: #BCCE6A; text-decoration: underline;">Get your key here</a></p></div>';
-      return;
-    }
-  }
+  // API key is no longer handled in the browser — it lives securely
+  // as a Netlify environment variable (ANTHROPIC_API_KEY).
 
   // Navigation
 document.querySelectorAll('.hub-nav-btn').forEach(btn => {
@@ -157,8 +145,7 @@ async function generateCaptions(prompt) {
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({
-        prompt: prompt,
-        apiKey: API_KEY
+        prompt: prompt
       })
     });
 

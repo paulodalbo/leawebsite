@@ -7,12 +7,23 @@ exports.handler = async (event) => {
   }
 
   try {
-    const { prompt, apiKey } = JSON.parse(event.body);
+    const { prompt } = JSON.parse(event.body);
 
-    if (!prompt || !apiKey) {
+    // API key is stored securely as a Netlify environment variable —
+    // it never touches the browser or the repo.
+    const apiKey = process.env.ANTHROPIC_API_KEY;
+
+    if (!apiKey) {
+      return {
+        statusCode: 500,
+        body: JSON.stringify({ error: 'Server is missing ANTHROPIC_API_KEY. Add it in Netlify > Site settings > Environment variables.' })
+      };
+    }
+
+    if (!prompt) {
       return {
         statusCode: 400,
-        body: JSON.stringify({ error: 'Missing prompt or API key' })
+        body: JSON.stringify({ error: 'Missing prompt' })
       };
     }
 
