@@ -208,8 +208,13 @@ function displayResults(captions) {
       <h3>Option ${index + 1}</h3>
       <div class="result-copy">${escapeHtml(item.caption)}</div>
       ${hashtagsHtml}
-      <button class="copy-btn" onclick="copyCaptionToClipboard(this, '${escapeHtml(item.caption)}', '${item.hashtags}')">Copy Caption</button>
+      <button class="copy-btn" type="button">Copy Caption</button>
     `;
+
+    // Attach the click handler directly so caption text (quotes, line
+    // breaks, etc.) can never break an inline onclick string.
+    const btn = card.querySelector('.copy-btn');
+    btn.addEventListener('click', () => copyCaptionToClipboard(btn, item.caption, item.hashtags));
 
     copyResults.appendChild(card);
   });
@@ -221,19 +226,42 @@ function escapeHtml(text) {
   return div.innerHTML;
 }
 
-window.copyCaptionToClipboard = function(btn, caption, hashtags) {
+function copyCaptionToClipboard(btn, caption, hashtags) {
   const fullText = hashtags ? `${caption}\n\n${hashtags}` : caption;
 
-  navigator.clipboard.writeText(fullText).then(() => {
+  const showCopied = () => {
     btn.textContent = '✓ Copied!';
     btn.classList.add('copied');
-
     setTimeout(() => {
       btn.textContent = 'Copy Caption';
       btn.classList.remove('copied');
     }, 2000);
-  });
-};
+  };
+
+  // Modern API (needs HTTPS — which Netlify provides)
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(fullText).then(showCopied).catch(() => fallbackCopy(fullText, showCopied));
+  } else {
+    fallbackCopy(fullText, showCopied);
+  }
+}
+
+function fallbackCopy(text, onSuccess) {
+  const ta = document.createElement('textarea');
+  ta.value = text;
+  ta.style.position = 'fixed';
+  ta.style.opacity = '0';
+  document.body.appendChild(ta);
+  ta.focus();
+  ta.select();
+  try {
+    document.execCommand('copy');
+    onSuccess();
+  } catch (e) {
+    alert('Could not copy automatically. Please select and copy manually.');
+  }
+  document.body.removeChild(ta);
+}
 
   console.log('✦ Lea Hub loaded. Ready to generate amazing captions!');
 }
