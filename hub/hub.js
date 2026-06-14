@@ -282,6 +282,44 @@ function fallbackCopy(text, onSuccess) {
   document.body.removeChild(ta);
 }
 
+  // --- Website Manager ---
+  const publishBtn = document.getElementById('publishBtn');
+  const publishStatus = document.getElementById('publishStatus');
+  const fields = () => document.querySelectorAll('#website [data-field]');
+
+  // Load current content into the form
+  fetch('/content.json?v=' + Date.now()).then(r => r.ok ? r.json() : {}).then(c => {
+    fields().forEach(el => { if (c[el.dataset.field] != null) el.value = c[el.dataset.field]; });
+  }).catch(() => {});
+
+  if (publishBtn) {
+    publishBtn.addEventListener('click', async () => {
+      const content = {};
+      fields().forEach(el => { content[el.dataset.field] = el.value; });
+
+      publishBtn.disabled = true;
+      publishBtn.innerHTML = '<span class="loading-spinner"></span>Publishing...';
+      publishStatus.textContent = '';
+
+      try {
+        const res = await fetch('/.netlify/functions/update-content', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ content })
+        });
+        if (!res.ok) throw new Error((await res.json()).error || 'Publish failed');
+        publishStatus.style.color = '#5a7d3a';
+        publishStatus.textContent = '✓ Published! Live in ~1 minute.';
+      } catch (e) {
+        publishStatus.style.color = '#C57F6A';
+        publishStatus.textContent = 'Error: ' + e.message;
+      } finally {
+        publishBtn.disabled = false;
+        publishBtn.innerHTML = 'Publish to website';
+      }
+    });
+  }
+
   // Show today's remaining generations (after all consts are initialized)
   updateUsageDisplay();
 

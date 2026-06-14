@@ -370,12 +370,12 @@ html.js .reveal.in{opacity:1;transform:none}
 <header class="hero" id="top">
   <div class="wrap hero-grid">
     <div>
-      <span class="eyebrow">Biomagnetic Pair Therapy</span>
-      <h1>Gentle magnets.<br><em>Profound calm.</em></h1>
-      <p class="lead">Biomagnetism is a soft, non-invasive therapy that uses paired magnets to support your body's natural balance — a quiet hour where your whole system gets to exhale.</p>
+      <span class="eyebrow" data-content="hero_eyebrow">Biomagnetic Pair Therapy</span>
+      <h1><span data-content="hero_title_1">Gentle magnets.</span><br><em data-content="hero_title_2">Profound calm.</em></h1>
+      <p class="lead" data-content="hero_lead">Biomagnetism is a soft, non-invasive therapy that uses paired magnets to support your body's natural balance — a quiet hour where your whole system gets to exhale.</p>
       <div class="hero-ctas">
-        <a href="#book" class="btn btn-gold">Book your first session</a>
-        <a href="#map" class="btn btn-line">Explore the placement map</a>
+        <a href="#book" class="btn btn-gold" data-content="hero_cta_primary">Book your first session</a>
+        <a href="#map" class="btn btn-line" data-content="hero_cta_secondary">Explore the placement map</a>
       </div>
       <div class="hero-meta">
         <span><span class="spark">✦</span>Online · worldwide</span>
@@ -1253,6 +1253,16 @@ document.querySelectorAll('.faq .q').forEach(btn=>{
     obs.observe(dsvg);
   }
 })();
+</script>
+<script>
+/* Load editable content from content.json (managed via the Hub) */
+fetch('content.json?v=' + Date.now()).then(r => r.ok ? r.json() : null).then(c => {
+  if (!c) return;
+  document.querySelectorAll('[data-content]').forEach(el => {
+    const key = el.dataset.content;
+    if (c[key] != null && c[key] !== '') el.textContent = c[key];
+  });
+}).catch(() => {});
 </script>
 </body>
 </html>

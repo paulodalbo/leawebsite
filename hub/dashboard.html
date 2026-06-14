@@ -175,9 +175,40 @@
 
     <!-- WEBSITE MANAGER (COMING SOON) -->
     <div id="website" class="hub-section">
-      <div class="empty-state">
-        <p>🔨 Website Manager coming soon</p>
-        <p style="font-size: .9rem;">Edit your site content, images, and services from here.</p>
+      <div class="copy-form">
+        <h2 style="font-size: 1.4rem; margin-bottom: 1.5rem; font-weight: 600;">Website — Hero Section</h2>
+
+        <div class="form-group">
+          <label for="hero_eyebrow">Eyebrow (small label)</label>
+          <input type="text" id="hero_eyebrow" data-field="hero_eyebrow">
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="hero_title_1">Title line 1</label>
+            <input type="text" id="hero_title_1" data-field="hero_title_1">
+          </div>
+          <div class="form-group">
+            <label for="hero_title_2">Title line 2 (italic)</label>
+            <input type="text" id="hero_title_2" data-field="hero_title_2">
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="hero_lead">Intro paragraph</label>
+          <textarea id="hero_lead" data-field="hero_lead"></textarea>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="hero_cta_primary">Primary button</label>
+            <input type="text" id="hero_cta_primary" data-field="hero_cta_primary">
+          </div>
+          <div class="form-group">
+            <label for="hero_cta_secondary">Secondary button</label>
+            <input type="text" id="hero_cta_secondary" data-field="hero_cta_secondary">
+          </div>
+        </div>
+
+        <button class="btn-generate" id="publishBtn">Publish to website</button>
+        <p id="publishStatus" style="margin-top: 1rem; font-size: .9rem;"></p>
       </div>
     </div>
 
