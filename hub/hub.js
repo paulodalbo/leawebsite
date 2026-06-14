@@ -43,6 +43,9 @@ function initHub() {
   // API key is no longer handled in the browser — it lives securely
   // as a Netlify environment variable (ANTHROPIC_API_KEY).
 
+  // Show today's remaining generations
+  updateUsageDisplay();
+
   // Navigation
 document.querySelectorAll('.hub-nav-btn').forEach(btn => {
   btn.addEventListener('click', () => {
@@ -62,6 +65,35 @@ document.querySelectorAll('.hub-nav-btn').forEach(btn => {
 const generateBtn = document.getElementById('generateBtn');
 const copyResults = document.getElementById('copyResults');
 
+// --- Daily usage limit (per browser) ---
+const DAILY_LIMIT = 30;
+
+function getUsage() {
+  const today = new Date().toISOString().slice(0, 10); // YYYY-MM-DD
+  let data;
+  try { data = JSON.parse(localStorage.getItem('hubUsage')); } catch (e) { data = null; }
+  if (!data || data.date !== today) {
+    data = { date: today, count: 0 };
+  }
+  return data;
+}
+
+function getRemaining() {
+  return Math.max(0, DAILY_LIMIT - getUsage().count);
+}
+
+function incrementUsage() {
+  const data = getUsage();
+  data.count += 1;
+  localStorage.setItem('hubUsage', JSON.stringify(data));
+  updateUsageDisplay();
+}
+
+function updateUsageDisplay() {
+  const el = document.getElementById('usageCounter');
+  if (el) el.textContent = `${getRemaining()} of ${DAILY_LIMIT} generations left today`;
+}
+
 generateBtn.addEventListener('click', async () => {
   const serviceType = document.getElementById('serviceType').value;
   const platform = document.getElementById('platform').value;
@@ -74,6 +106,12 @@ generateBtn.addEventListener('click', async () => {
     return;
   }
 
+  // Enforce daily limit
+  if (getRemaining() <= 0) {
+    copyResults.innerHTML = `<div class="empty-state" style="color: #C57F6A;"><p>Daily limit reached</p><p style="font-size:.9rem;">You've used all ${DAILY_LIMIT} generations for today. Please come back tomorrow.</p></div>`;
+    return;
+  }
+
   generateBtn.disabled = true;
   generateBtn.innerHTML = '<span class="loading-spinner"></span>Generating...';
   copyResults.innerHTML = '';
@@ -82,6 +120,7 @@ generateBtn.addEventListener('click', async () => {
     const prompt = buildPrompt(serviceType, platform, briefing, tone, cta);
     const captions = await generateCaptions(prompt);
     displayResults(captions);
+    incrementUsage(); // only count successful generations
   } catch (error) {
     copyResults.innerHTML = `<div class="empty-state" style="color: #C57F6A;"><p>Error: ${error.message}</p></div>`;
   } finally {
